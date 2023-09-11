@@ -8,28 +8,7 @@
 <script src="/js/jQuery-2-1.4.min.js"></script>
 
 <script>
-$(document).ready(function() {
-	/*
-	$("#listBtn").on("click", function() {
-		$.get("/boards", function(data) {
-			var list = JSON.parse(JSON.stringify(data));
-			alert(list);
-		});
-	});
-	*/
-	
-	$.get("/boards", function(data) {
-		var listContainer = $("#listContainer");
-		
-		$.each(data, function(index, item) {
-			var newDiv = $("<div>");
-			
-			newDiv.text("Tile : " + item.title + ", Writer : " + item.writer + ", Content : " + item.content);
-			
-			listContainer.append(newDiv);
-		});
-	});
-});
+
 </script>
 <body>
 
