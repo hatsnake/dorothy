@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ucamp.dorothy.mapper.MemberMapper">
+
+	<select id="list" resultType="com.ucamp.dorothy.domain.Member">
+		<![CDATA[
+		SELECT 
+		    ID
+		  , EMAIL
+		  , PW
+		  , NAME
+		  , HP
+		  , DELETE_YN AS DELETEYN
+		  , AUTH
+		  , CREATED_USER AS CREATEDUSER
+		  , CREATED_DATE AS CREATEDDATE
+		  , UPDATED_USER AS UPDATEDUSER
+		  , UPDATED_DATE AS UPDATEDDATE
+		FROM MEMBER
+		ORDER BY ID DESC
+		]]>
+	</select>
+
+</mapper>
