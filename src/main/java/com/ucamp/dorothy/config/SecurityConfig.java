@@ -49,9 +49,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.hasRole("A");
 		*/
 		
+		/*
 		http.authorizeHttpRequests()
 			.antMatchers("/", "/login", "/register").permitAll()
 			.anyRequest().authenticated();
+		*/
 		
 		// 접근 에러시 나오는 페이지
 		http.exceptionHandling()
