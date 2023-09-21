@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<th:block th:fragment="headerFragment">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!--===============================================================================================-->	
+		<link rel="icon" type="image/png" href="/images/icons/favicon.png"/>
+	<!--===============================================================================================-->
+		<link rel="stylesheet" type="text/css" href="/vendor/bootstrap/css/bootstrap.min.css">
+	<!--===============================================================================================-->
+		<link rel="stylesheet" type="text/css" href="/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+	<!--===============================================================================================-->
+		<link rel="stylesheet" type="text/css" href="/fonts/iconic/css/material-design-iconic-font.min.css">
+	<!--===============================================================================================-->
+		<link rel="stylesheet" type="text/css" href="/fonts/linearicons-v1.0.0/icon-font.min.css">
+	<!--===============================================================================================-->
+		<link rel="stylesheet" type="text/css" href="/vendor/animate/animate.css">
+	<!--===============================================================================================-->	
+		<link rel="stylesheet" type="text/css" href="/vendor/css-hamburgers/hamburgers.min.css">
+	<!--===============================================================================================-->
+		<link rel="stylesheet" type="text/css" href="/vendor/animsition/css/animsition.min.css">
+	<!--===============================================================================================-->
+		<link rel="stylesheet" type="text/css" href="/vendor/select2/select2.min.css">
+	<!--===============================================================================================-->
+		<link rel="stylesheet" type="text/css" href="/vendor/perfect-scrollbar/perfect-scrollbar.css">
+	<!--===============================================================================================-->
+		<link rel="stylesheet" type="text/css" href="/css/util.css">
+		<link rel="stylesheet" type="text/css" href="/css/main.css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+	<!--===============================================================================================-->
+	</head>
+	<body class="animsition">
+	
+		<!-- Header -->
+		<header class="header-v2">
+			<!-- Header desktop -->
+			<div class="container-menu-desktop">
+				<div class="wrap-menu-desktop how-shadow1">
+					<nav class="limiter-menu-desktop container">
+						<!-- Logo desktop -->		
+						<a href="/" class="logo">
+							<img src="/images/icons/logo-01.png" alt="IMG-LOGO">
+						</a>
+	
+						<!-- Menu desktop -->
+						<div class="menu-desktop">
+							<ul class="main-menu">
+								<li>
+									<a href="/" style="font-size:17px;">먹거리 주문</a>
+								</li>
+							</ul>
+						</div>	
+	
+						<!-- Icon header -->
+						<div class="wrap-icon-header flex-w flex-r-m">
+							<span sec:authorize="isAnonymous()">
+								<a href="/login" class="flex-c-m mtext-102 cl6 bor4 p-lr-15 hov-tag1 trans-04 m-r-5 m-b-5" style="background-color: #0e79d1; font-weight:bold; color:white; height:42px;">
+									로그인 및 회원가입
+								</a>
+							</span>
+							
+							<span sec:authorize="isAuthenticated()">
+								<span sec:authentication="name" style="font-size:17px; font-weight:bold;"></span>
+								<form action="/logout" method="post" style="display:inline-block;">
+									<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+									<button class="flex-c-m mtext-102 cl6 bor4 p-lr-15 hov-tag1 trans-04 m-r-5 m-b-5" style="background-color: #0e79d1; font-weight:bold; color:white; height:42px;">
+										로그아웃
+									</button>
+								</form>
+							</span>
+						</div>
+					</nav>
+				</div>	
+			</div>
+	
+			<!-- Header Mobile -->
+			<div class="wrap-header-mobile">
+				<!-- Logo moblie -->		
+				<div class="logo-mobile">
+					<a href="/"><img src="/images/icons/logo-01.png" alt="IMG-LOGO"></a>
+				</div>
+	
+				<!-- Icon header -->
+				<div class="wrap-icon-header flex-w flex-r-m m-r-15">
+					<span sec:authorize="isAnonymous()">
+						<a href="/login" class="flex-c-m mtext-102 cl6 bor4 p-lr-15 hov-tag1 trans-04 m-r-5 m-b-5" style="background-color: #0e79d1; font-weight:bold; color:white; height:42px;">
+							로그인 및 회원가입
+						</a>
+					</span>
+					
+					<span sec:authorize="isAuthenticated()">
+						<span sec:authentication="name" style="font-size:17px; font-weight:bold;"></span>
+						<form action="/logout" method="post" style="display:inline-block;">
+							<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+							<button class="flex-c-m mtext-102 cl6 bor4 p-lr-15 hov-tag1 trans-04 m-r-5 m-b-5" style="background-color: #0e79d1; font-weight:bold; color:white; height:42px;">
+								로그아웃
+							</button>
+						</form>
+					</span>
+				</div>
+	
+	
+				<!-- Button show menu -->
+				<div class="btn-show-menu-mobile hamburger hamburger--squeeze">
+					<span class="hamburger-box">
+						<span class="hamburger-inner"></span>
+					</span>
+				</div>
+			</div>
+	
+	
+			<!-- Menu Mobile -->
+			<div class="menu-mobile">
+				<ul class="main-menu-m">
+					<li>
+						<a href="product.html">먹거리 주문</a>
+					</li>
+				</ul>
+			</div>
+		</header>
+</th:block>
+</html>

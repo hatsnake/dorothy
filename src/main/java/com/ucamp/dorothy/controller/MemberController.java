@@ -1,30 +1,51 @@
 package com.ucamp.dorothy.controller;
 
-import java.util.List;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
-import com.ucamp.dorothy.domain.Member;
-import com.ucamp.dorothy.service.MemberService;
-
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@RequiredArgsConstructor
-@RestController
-@RequestMapping("/members")
+@Controller
+//@RequestMapping("/members")
 public class MemberController {
-	private final MemberService service;
 	
-	@GetMapping
-	public ResponseEntity<List<Member>> list() throws Exception {
-		log.info("Member List");
+	@GetMapping("/login")
+	public String loginForm(String error, String logout, Model model) {
+		log.info("Login Page Start");
+		log.info("error : " + error);
+		log.info("logout : " + logout);
 		
-		return new ResponseEntity<>(service.list(), HttpStatus.OK);
+		if(error != null) {
+			model.addAttribute("error", error);
+		}
+		
+		if(logout != null) {
+			model.addAttribute("logout", logout);
+		}
+		
+		log.info("Login Page End");
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if(auth instanceof AnonymousAuthenticationToken)
+			return "/members/loginForm";
+		return "redirect:/";
+	}
+	
+	@GetMapping("/register")
+	public String registerForm() {
+		log.info("Register Page Start");
+
+		log.info("Register Page End");
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if(auth instanceof AnonymousAuthenticationToken)
+			return "/members/registerForm";
+		return "redirect:/";
 	}
 }

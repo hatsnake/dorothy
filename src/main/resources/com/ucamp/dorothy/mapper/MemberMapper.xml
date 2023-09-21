@@ -23,5 +23,23 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		ORDER BY ID DESC
 		]]>
 	</select>
+	
+	<insert id="register" parameterType="com.ucamp.dorothy.domain.Member">
+		INSERT INTO MEMBER (
+		    EMAIL
+		  , PW
+		  , NAME
+		  , HP
+		  , CREATED_USER
+		  , CREATED_DATE
+		) VALUES (
+			#{email}
+		  , #{pw}
+		  , #{name}
+		  , #{hp}
+		  , #{email}
+		  , now()
+		)
+	</insert>
 
 </mapper>
