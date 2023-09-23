@@ -14,7 +14,7 @@ public class OrderController {
 		
 		log.info("Order Page End");
 		
-		return "/order/orderHist";
+		return "order/orderHist";
 	}
 
 }
