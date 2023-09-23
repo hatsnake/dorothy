@@ -33,7 +33,7 @@ public class MemberController {
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if(auth instanceof AnonymousAuthenticationToken)
-			return "/loginForm";
+			return "/members/loginForm";
 		return "redirect:/";
 	}
 	
