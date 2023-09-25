@@ -2,6 +2,8 @@ package com.ucamp.dorothy.service;
 
 import java.util.List;
 
+import org.springframework.security.core.userdetails.UserDetailsService;
+
 import com.ucamp.dorothy.domain.Member;
 
 public interface MemberService {
