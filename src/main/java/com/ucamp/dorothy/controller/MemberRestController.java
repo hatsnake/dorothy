@@ -1,7 +1,5 @@
 package com.ucamp.dorothy.controller;
 
-import java.util.List;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,18 +16,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-//@RequestMapping("/members")
+@RequestMapping("/members")
 public class MemberRestController {
 	private final MemberService service;
-	
-	/*
-	@GetMapping("/")
-	public ResponseEntity<List<Member>> list() throws Exception {
-		log.info("Member List");
-		
-		return new ResponseEntity<>(service.list(), HttpStatus.OK);
-	}
-	*/
 	
 	@PostMapping("/register")
 	public ResponseEntity<String> register(Member member) throws Exception {
@@ -37,7 +26,18 @@ public class MemberRestController {
 		
 		log.info("Member Register End");
 		
-		return service.register(member) >= 1 ? new ResponseEntity<>((new String("계정 생성 성공")), HttpStatus.OK)
+		return service.register(member) >= 1 ? new ResponseEntity<>((new String("success")), HttpStatus.OK)
 											 : new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@GetMapping("/register/emailDupCheck")
+	public ResponseEntity<Boolean> emailDupCheck(String email) throws Exception {
+		log.info("Email Duplicate Check Start");
+		
+		boolean dupFlag = service.emailDupCheck(email) == 0 ? true : false;
+		
+		log.info("Email Duplicate Check End");
+		
+		return new ResponseEntity<>(dupFlag, HttpStatus.OK);
 	}
 }

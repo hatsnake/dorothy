@@ -9,4 +9,5 @@ import com.ucamp.dorothy.domain.Member;
 public interface MemberService {
 	public List<Member> list() throws Exception;
 	public int register(Member member) throws Exception;
+	public int emailDupCheck(String email) throws Exception;
 }

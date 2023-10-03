@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="layout/default_layout">
+<th:block layout:fragment="content">
+
+<style>
+/* The customcheck */
+.customcheck {
+	display: block;
+	position: relative;
+	padding-left: 35px;
+	margin-bottom: 12px;
+	cursor: pointer;
+	font-size: 15px;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	line-height: 1.7 !important;
+}
+
+/* Hide the browser's default checkbox */
+.customcheck input {
+	position: absolute;
+	opacity: 0;
+	cursor: pointer;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 25px;
+	width: 25px;
+	background-color: #eee;
+	border-radius: 5px;
+}
+
+/* On mouse-over, add a grey background color */
+.customcheck:hover input ~ .checkmark {
+	background-color: #ccc;
+}
+
+/* When the checkbox is checked, add a blue background */
+.customcheck input:checked ~ .checkmark {
+	background-color: #02cf32;
+	border-radius: 5px;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+	content: "";
+	position: absolute;
+	display: none;
+}
+
+/* Show the checkmark when checked */
+.customcheck input:checked ~ .checkmark:after {
+	display: block;
+}
+
+/* Style the checkmark/indicator */
+.customcheck .checkmark:after {
+	left: 8px;
+	top: 2px;
+	width: 10px;
+	height: 15px;
+	border: solid white;
+	border-width: 0 3px 3px 0;
+	-webkit-transform: rotate(45deg);
+	-ms-transform: rotate(45deg);
+	transform: rotate(45deg);
+}
+</style>
+
+<script>
+// 초기 실행값
+$(document).ready(function() {
+	iconEffect();
+	
+	$("#email_in").on({
+		input: function() {
+			emailCheck();
+		}
+	});
+	
+	$("#name_in").on({
+		input: function() {
+			nameCheck();
+		},
+		focusout: function() {
+			nameCheck();
+		}
+	});
+	
+	$("#pw_in").on({
+		input: function() {
+			pwCheck();
+		},
+		focusout: function() {
+			pwCheck();
+		}
+	});
+	
+	$("#repw_in").on({
+		input: function() {
+			repwCheck();
+		},
+		focusout: function() {
+			repwCheck();
+		},
+		focus: function() {
+			repwCheck();
+		}
+	});
+	
+	$("#hp_in").on({
+		input: function() {
+			hpCheck();
+		},
+		focusout: function() {
+			hpCheck();
+		}
+	});
+	
+	$("#register_btn").on("click", function() {
+		registerConfirm("회원가입을 완료하시겠습니까?", "회원가입");
+	});
+});
+
+// 회원가입 AJAX
+function registerConfirm(msg, title) {
+	swal({
+		title: title,
+		text: msg,
+		icon: "info",
+		buttons: {
+			confirm: {
+				text: "확인",
+				value: true,
+				visible: true,
+				className: "swal-success",
+				closeModal: true
+			},
+			cancel: {
+				text: "취소",
+				value: false,
+				visible: true,
+				className: "swal-cancel",
+				closeModal: true
+			}
+		}
+	})
+	.then((isConfirm) => {
+		if(isConfirm) {
+			var emailFlag = emailCheck();
+			var nameFlag = nameCheck();
+			var pwFlag = pwCheck();
+			var repwFlag = repwCheck();
+			var hpFlag = hpCheck();
+			
+			if(emailFlag == false || nameFlag == false || 
+			   pwFlag == false || repwFlag == false ||
+			   hpFlag == false) {
+				scrollToTop();
+				swal({
+				  title: "회원가입을 완료하지 못했습니다.\n다시 확인해주세요.",
+				  timer: 2000, // 알림이 자동으로 사라지는 시간 (밀리초 단위)
+				  toast: true, // 토스트 모드 활성화
+				  icon: "warning" // 아이콘 설정 (success, error, warning, info 등)
+				});
+				return false;
+			}
+			
+			// 회원가입 로직
+			var registerParams = {
+				email : $("#email_in").val(),
+				name : $("#name_in").val(),
+				pw : $("#pw_in").val(),
+				hp : $("#hp_in").val()
+			};
+			
+			$.ajax({
+				method: "POST",
+				url: "/members/register",
+				data: registerParams,
+				beforeSend: function(xhr) {
+		           var header = $("meta[name='_csrf_header']").attr("content");
+		           var token = $("meta[name='_csrf']").attr("content");
+		           xhr.setRequestHeader(header, token);
+				},
+				success: function(res) {
+					if(res == "success") {
+						location.href = "/login";
+					} else {
+						alert("회원가입 실패\n원인 : " + res);
+					}
+				},
+				error: function(request, status, error) {
+					alert("회원가입 실패\n상태 : " + request.status + "\n원인메시지 : " + request.responseText);
+				}
+			});
+		} else {
+			
+		}
+	});	  
+}
+
+// 이메일 유효성 검사
+function emailCheck() {
+	var email = $("#email_in");
+	var emailMessage = $("#email_message");
+	var emailPattern = /^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$/;
+	
+	// 이메일 빈값체크
+	if(email.val() == "") {
+		email.css("border", "1px solid red");
+		emailMessage.html("* 이메일은 필수 입력 정보입니다.");
+		emailMessage.css("color", "red");
+		return false;
+	}
+	
+	// 이메일 입력조건체크
+	if(!(emailPattern.test(email.val()))) {
+		email.css("border", "1px solid red");
+		email.css("color", "red");
+		emailMessage.html("* 이메일이 유효하지 않습니다.");
+		emailMessage.css("color", "red");
+		return false;
+	}
+	
+	var dupCheck = emailDupCheck();
+	
+	// 이메일 통과
+	email.css("border", "1px solid green");
+	email.css("color", "green");
+	emailMessage.html("");
+	
+	return true;
+}
+
+// 이메일 중복 유효성 검사
+function emailDupCheck() {
+	var email = $("#email_in");
+	var emailMessage = $("#email_message");
+	var result = false;
+	
+	var emailDupCheckParams = {
+		email : email.val()	
+	};
+	
+	$.ajax({
+		method: "GET",
+		url: "/members/register/emailDupCheck",
+		data: emailDupCheckParams,
+		beforeSend: function(xhr) {
+			
+		},
+		success: function(res) {
+			if(res == true) {
+				//email.css("border", "1px solid green");
+				//email.css("color", "green");
+				//emailMessage.html("");
+				//emailMessage.css("color", "green");
+				result = true;
+			} else {
+				email.css("border", "1px solid red");
+				email.css("color", "red");
+				emailMessage.html("* 중복된 이메일입니다.");
+				emailMessage.css("color", "red");
+				result = false;
+			}
+		},
+		error: function(request, status, error) {
+			alert("이메일 중복체크 실패\n상태 : " + request.status + "\n원인메시지 : " + request.responseText);
+		}
+	});
+	
+	return result;
+}
+
+// 이름 유효성 검사
+function nameCheck() {
+	var name = $("#name_in");
+	var nameMessage = $("#name_message");
+	var namePattern = /^.{2,20}$/;
+	
+	// 이름 빈값체크
+	if(name.val() == "") {
+		name.css("border", "1px solid red");
+		nameMessage.html("* 이름은 필수 입력 정보입니다.");
+		nameMessage.css("color", "red");
+		return false;
+	}
+	
+	// 이름 입력조건체크
+	if(!(namePattern.test(name.val()))) {
+		name.css("border", "1px solid red");
+		name.css("color", "red");
+		nameMessage.html("* 이름은 2글자에서 20글자만 입력 가능합니다.");
+		nameMessage.css("color", "red");
+		return false;
+	}
+	
+	// 이름 통과
+	name.css("border", "1px solid green");
+	name.css("color", "green");
+	nameMessage.html("");
+}
+
+// 비밀번호 유효성 검사
+function pwCheck() {
+	var pw = $("#pw_in");
+	var pwMessage = $("#pw_message");
+	var repw = $("#repw_in");
+	var repwMessage = $("#repw_message");
+	var pwPattern = /^[a-zA-Z0-9!@#$%^&*()_+{}\[\]:;<>,.?~\\-]{8,16}$/;
+	
+	// 비밀번호와 비교
+	if(pwPattern.test(pw.val()) && pw.val() == repw.val()) {
+		repw.css("border", "1px solid green");
+		repw.css("color", "green");
+		repwMessage.html("");
+	} else {
+		repw.css("border", "1px solid red");
+		repw.css("color", "red");
+		repwMessage.html("* 비밀번호 입력이 잘못됐거나 같지 않습니다.");
+		repwMessage.css("color", "red");
+	}
+	
+	// 비밀번호 빈값체크
+	if(pw.val() == "") {
+		pw.css("border", "1px solid red");
+		pwMessage.html("* 비밀번호는 필수 입력 정보입니다.");
+		pwMessage.css("color", "red");
+		return false;
+	}
+	
+	// 비밀번호 입력조건체크
+	if(!(pwPattern.test(pw.val()))) {
+		pw.css("border", "1px solid red");
+		pw.css("color", "red");
+		pwMessage.html("* 비밀번호는 8~16자의 영문 대/소문자, 숫자, 특수문자를 사용해 주세요.");
+		pwMessage.css("color", "red");
+		return false;
+	}
+	
+	// 비밀번호 통과
+	pw.css("border", "1px solid green");
+	pw.css("color", "green");
+	pwMessage.html("");
+	
+	return true;
+}
+
+// 비밀번호 확인 유효성 검사
+function repwCheck() {
+	var pw = $("#pw_in");
+	var repw = $("#repw_in");
+	var repwMessage = $("#repw_message");
+	var pwPattern = /^[a-zA-Z0-9!@#$%^&*()_+{}\[\]:;<>,.?~\\-]{8,16}$/;
+	
+	// 비밀번호 확인 빈값체크
+	if(repw.val() == "") {
+		repw.css("border", "1px solid red");
+		repwMessage.html("* 비밀번호 입력이 없거나 같지 않습니다.");
+		repwMessage.css("color", "red");
+		return false;
+	}
+	
+	// 비밀번호와 비밀번호 확인 비교
+	if(pwPattern.test(pw.val()) && pw.val() == repw.val()) {
+		repw.css("border", "1px solid green");
+		repw.css("color", "green");
+		repwMessage.html("");
+	} else {
+		repw.css("border", "1px solid red");
+		repw.css("color", "red");
+		repwMessage.html("* 비밀번호 입력이 잘못됐거나 같지 않습니다.");
+		repwMessage.css("color", "red");
+		return false;
+	}
+	
+	return true;
+}
+
+// 전화번호 유효성 검사
+function hpCheck() {
+	var hp = $("#hp_in");
+	var hpMessage = $("#hp_message");
+	
+	// 전화번호 빈값체크
+	if(hp.val() == "") {
+		hp.css("border", "1px solid red");
+		hpMessage.html("* 전화번호는 필수 입력 정보입니다.");
+		hpMessage.css("color", "red");
+		return false;
+	}
+	
+	// 전화번호 통과
+	hp.css("border", "1px solid green");
+	hp.css("color", "green");
+	hpMessage.html("");
+	
+	return true;
+}
+
+// 입력값 아이콘 효과
+function iconEffect() {
+	$("#email_in").on("focus", function() {
+		$("#email_icon").addClass("fa-beat");
+	});
+
+	$("#email_in").on("focusout", function() {
+		$("#email_icon").removeClass("fa-beat");
+	});
+
+	$("#name_in").on("focus", function() {
+		$("#name_icon").addClass("fa-beat");
+	});
+
+	$("#name_in").on("focusout", function() {
+		$("#name_icon").removeClass("fa-beat");
+	});
+
+	$("#pw_in").on("focus", function() {
+		$("#pw_icon").addClass("fa-beat");
+		$("#repw_icon").addClass("fa-beat");
+	});
+
+	$("#pw_in").on("focusout", function() {
+		$("#pw_icon").removeClass("fa-beat");
+		$("#repw_icon").removeClass("fa-beat");
+	});
+
+	$("#repw_in").on("focus", function() {
+		$("#pw_icon").addClass("fa-beat");
+		$("#repw_icon").addClass("fa-beat");
+	});
+
+	$("#repw_in").on("focusout", function() {
+		$("#pw_icon").removeClass("fa-beat");
+		$("#repw_icon").removeClass("fa-beat");
+	});
+
+	$("#hp_in").on("focus", function() {
+		$("#hp_icon").addClass("fa-shake");
+	});
+
+	$("#hp_in").on("focusout", function() {
+		$("#hp_icon").removeClass("fa-shake");
+	});
+}
+
+// 페이지 스크롤 맨위로 올리기
+function scrollToTop() {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth' // 부드러운 스크롤 효과를 위해 'smooth' 사용
+    });
+}
+
+</script>
+
+<!-- Content page -->
+<section class="bg0 p-t-104 p-b-116">
+	<div class="container">
+		<div class="bor10 p-lr-70 p-t-55 p-b-70 p-lr-15-lg w-full-md" style="max-width:690px; margin:0 auto;">
+			<form id="register_form">
+				<h4 class="ltext-103 cl2 txt-center p-b-20" style="font-weight:bold">
+					회원가입
+				</h4>
+
+				<!-- 이메일 -->
+				<div class="m-tb-30">
+					<div class="flex-w w-full">
+						<span class="fs-18 cl5 txt-center size-211">
+							<i id="email_icon" class="fa-solid fa-at"></i>
+						</span>
+
+						<div class="size-212 p-t-2">
+							<span class="mtext-110 cl2" style="font-weight:bold">
+								이메일
+							</span>
+							<span style="color:red">
+								*
+							</span>
+						</div>
+					</div>
+
+					<div class="flex-w flex-m m-tb-5">
+						<input id="email_in"  type="text" name="email" class="stext-104 cl2 plh4 size-116 bor13 p-lr-20 m-tb-5" placeholder="이메일 입력" style="border-radius:0;">
+							
+						<div class="flex-c-m stext-101 cl2 size-118 bg8 bor13 p-lr-15 trans-04 pointer m-tb-5" style="border-radius:0; font-weight:bold;">
+							이메일 인증
+						</div>
+					</div>
+					<div id="email_message"></div>
+				</div>
+
+				<!-- 이름 -->
+				<div class="m-tb-30">
+					<div class="flex-w w-full">
+						<span class="fs-18 cl5 txt-center size-211">
+							<i id="name_icon" class="fa-solid fa-user"></i>
+						</span>
+
+						<div class="size-212 p-t-2">
+							<span class="mtext-110 cl2" style="font-weight:bold">
+								이름
+							</span>
+							<span style="color:red">
+								*
+							</span>
+						</div>
+					</div>
+
+					<div class="flex-w flex-m m-tb-5">
+						<input id="name_in" type="text" name="name" class="stext-104 cl2 plh4 size-116 bor13 p-lr-20 m-tb-5" placeholder="이름 입력" style="border-radius:0;">
+					</div>
+					
+					<div id="name_message"></div>
+				</div>
+
+				<!-- 비밀번호 -->
+				<div class="m-tb-30">
+					<div class="flex-w w-full">
+						<span class="fs-18 cl5 txt-center size-211">
+							<i id="pw_icon" class="fa-solid fa-lock"></i>
+						</span>
+
+						<div class="size-212 p-t-2">
+							<span class="mtext-110 cl2" style="font-weight:bold">
+								비밀번호
+							</span>
+							<span style="color:red">
+								*
+							</span>
+						</div>
+					</div>
+
+					<div class="flex-w flex-m m-tb-5">
+						<input id="pw_in" type="password" name="pw" class="stext-104 cl2 plh4 size-116 bor13 p-lr-20 m-tb-5" placeholder="비밀번호 입력" style="border-radius:0;">
+					</div>
+					
+					<div id="pw_message"></div>
+				</div>
+
+				<!-- 비밀번호 확인 -->
+				<div class="m-tb-30">
+					<div class="flex-w w-full">
+						<span class="fs-18 cl5 txt-center size-211">
+							<i id="repw_icon" class="fa-solid fa-key"></i>
+						</span>
+
+						<div class="size-212 p-t-2">
+							<span class="mtext-110 cl2" style="font-weight:bold">
+								비밀번호 확인
+							</span>
+							<span style="color:red">
+								*
+							</span>
+						</div>
+					</div>
+
+					<div class="flex-w flex-m m-tb-5">
+						<input id="repw_in" type="password" name="repw" class="stext-104 cl2 plh4 size-116 bor13 p-lr-20 m-tb-5" placeholder="비밀번호 확인 입력" style="border-radius:0;">
+					</div>
+					
+					<div id="repw_message"></div>
+				</div>
+
+				<!-- 전화번호 -->
+				<div class="m-tb-30">
+					<div class="flex-w w-full">
+						<span class="fs-18 cl5 txt-center size-211">
+							<i id="hp_icon" class="fa-solid fa-mobile-screen-button"></i>
+						</span>
+
+						<div class="size-212 p-t-2">
+							<span class="mtext-110 cl2" style="font-weight:bold">
+								전화번호
+							</span>
+							<span style="color:red">
+								*
+							</span>
+						</div>
+					</div>
+
+					<div class="flex-w flex-m m-tb-5">
+						<input id="hp_in" type="text" name="hp" class="stext-104 cl2 plh4 size-116 bor13 p-lr-20 m-tb-5" placeholder="전화번호 입력 (-없이 숫자만)" style="border-radius:0;">
+						<div class="flex-c-m stext-101 cl2 size-118 bg8 bor13 p-lr-15 trans-04 pointer m-tb-5" style="border-radius:0; font-weight:bold;">
+							전화번호 인증
+						</div>
+					</div>
+					
+					<div id="hp_message"></div>
+				</div>
+
+				<div class="m-tb-30">
+					<label class="customcheck" style="font-weight:bold">약관동의
+						<input type="checkbox">
+						<span class="checkmark"></span>
+					</label>
+				</div>
+
+				<div id="register_btn" class="flex-c-m stext-101 cl0 size-121 bg3 bor1 p-lr-15 trans-04 pointer" style="font-weight:bold">회원가입</div>
+				<div style="margin-top: 20px; text-align:center;">이미 계정이 있으신가요? <a href="/login">로그인</a></div>
+				
+				<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+			</form>
+		</div>
+	</div>
+</section>
+</th:block>
+</html>

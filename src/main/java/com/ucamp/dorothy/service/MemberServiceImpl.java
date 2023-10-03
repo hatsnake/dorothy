@@ -32,4 +32,9 @@ public class MemberServiceImpl implements MemberService {
 		member.hashPassword(bcryptPasswordEncoder);
 		return mapper.register(member);
 	}
+
+	@Override
+	public int emailDupCheck(String email) throws Exception {
+		return mapper.emailDupCheck(email);
+	}
 }

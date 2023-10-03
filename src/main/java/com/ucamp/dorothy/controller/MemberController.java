@@ -7,33 +7,31 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Controller
-//@RequestMapping("/members")
 public class MemberController {
 	
 	@GetMapping("/login")
-	public String loginForm(String error, String logout, Model model) {
+	public String loginForm(@RequestParam(required = false) String error, 
+							@RequestParam(required = false) String exception, 
+							Model model) {
 		log.info("Login Page Start");
 		log.info("error : " + error);
-		log.info("logout : " + logout);
+		log.info("exception : " + exception);
 		
 		if(error != null) {
-			model.addAttribute("error", error);
-		}
-		
-		if(logout != null) {
-			model.addAttribute("logout", logout);
+			model.addAttribute("exception", exception);
 		}
 		
 		log.info("Login Page End");
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if(auth instanceof AnonymousAuthenticationToken)
-			return "members/loginForm";
+			return "member/loginForm";
 		return "redirect:/";
 	}
 	
@@ -45,7 +43,7 @@ public class MemberController {
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if(auth instanceof AnonymousAuthenticationToken)
-			return "members/registerForm";
+			return "member/registerForm";
 		return "redirect:/";
 	}
 }

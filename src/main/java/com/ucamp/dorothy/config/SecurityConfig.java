@@ -8,8 +8,10 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
+import com.ucamp.dorothy.common.security.CustomLoginFailureHandler;
 import com.ucamp.dorothy.common.security.CustomLoginSuccessHandler;
 import com.ucamp.dorothy.service.MemberService;
 import com.ucamp.dorothy.service.SecurityService;
@@ -39,6 +41,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		return new CustomLoginSuccessHandler();
 	}
 	
+	@Bean AuthenticationFailureHandler authenticationFailureHandler() {
+		return new CustomLoginFailureHandler();
+	}
+	
     @Bean // 패스워드 암호화 관련 메소드
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
@@ -48,21 +54,31 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		log.info("security config...");
 
+		// 로그인 여부 접근 제어
+		http.authorizeRequests()
+			.antMatchers("/login", "/register", "/members/register/**").permitAll()
+			.anyRequest().authenticated();
+		
+		// 로그인 유지 기능
 		http.rememberMe()
 			.key("dorothygood!")
 			.rememberMeParameter("remember-me")
 			.tokenValiditySeconds(86400*30)
 			.userDetailsService(securityService);
 		
+		// 접근에러시 이동 페이지
 		http.exceptionHandling()
 			.accessDeniedPage("/accessError");
 		
+		// 로그아웃 기능
 		http.logout()
 		    .logoutUrl("/logout")
 		    .invalidateHttpSession(true);
 		
+		// 로그인 기능
 		http.formLogin()
 			.loginPage("/login")
+			.failureHandler(authenticationFailureHandler())
 			.successHandler(authenticationSuccessHandler());
 	}
 }

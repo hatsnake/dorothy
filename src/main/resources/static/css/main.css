@@ -3330,3 +3330,27 @@ input.num-product::-webkit-inner-spin-button {
   }
 
 }
+
+/*//////////////////////////////////////////////////////////////////
+[Customize] */
+.swal-success {
+	background-color: #01DF74;
+	font-weight: bold;
+	color: white;
+	font-size:20px;
+}
+
+.swal-success:hover {
+	background-color: #2F9D27;
+}
+
+.swal-cancel {
+	background-color: #BDBDBD;
+	font-weight: bold;
+	color: white;
+	font-size:20px;
+}
+
+.swal-cancel:hover {
+	background-color: #8C8C8C;
+}

@@ -44,4 +44,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<select id="signIn" parameterType="String" resultType="com.ucamp.dorothy.domain.Member">
 		SELECT ID, EMAIL, PW, NAME FROM MEMBER WHERE EMAIL = #{email}
 	</select>
+	
+	<select id="emailDupCheck" parameterType="String" resultType="Integer">
+		SELECT COUNT(*) FROM MEMBER WHERE EMAIL = #{email}
+	</select>
 </mapper>

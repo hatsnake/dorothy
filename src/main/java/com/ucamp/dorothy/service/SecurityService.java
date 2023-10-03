@@ -3,6 +3,7 @@ package com.ucamp.dorothy.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -22,16 +23,18 @@ public class SecurityService implements UserDetailsService {
 	private final MemberMapper mapper;
 	
 	@Override
-	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-		Member member = null;
-		List<GrantedAuthority> authorities = null;
-		try {
-			member = mapper.signIn(email);
-	        authorities = new ArrayList<>();
-	        authorities.add(new SimpleGrantedAuthority("MEMBER"));
-		} catch (Exception e) {
-			e.printStackTrace();
+	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {		
+		Member member = mapper.signIn(email).orElseThrow(() -> new UsernameNotFoundException("아이디가 존재하지 않습니다."));
+		
+		List<GrantedAuthority> authorities = new ArrayList<>();
+		
+		if(member.getAuth() == null) {
+			authorities.add(new SimpleGrantedAuthority("NOT USER"));						
+		} else {
+			authorities.add(new SimpleGrantedAuthority(member.getAuth()));			
 		}
-		return new User(member.getEmail(), member.getPw(), authorities);
+		
+		
+		return new User(member.getEmail(), member.getPw(), authorities); 
 	}
 }
