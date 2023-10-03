@@ -164,13 +164,20 @@ function registerConfirm(msg, title) {
 			if(emailFlag == false || nameFlag == false || 
 			   pwFlag == false || repwFlag == false ||
 			   hpFlag == false) {
+				// 스크롤 상단으로 이동
 				scrollToTop();
+				
+				var lines = ['회원가입을 완료하지 못했습니다.', ''];
+				
+				// 회원가입 불가 알림창
 				swal({
-				  title: "회원가입을 완료하지 못했습니다.\n다시 확인해주세요.",
-				  timer: 2000, // 알림이 자동으로 사라지는 시간 (밀리초 단위)
-				  toast: true, // 토스트 모드 활성화
-				  icon: "warning" // 아이콘 설정 (success, error, warning, info 등)
+				  title: "회원가입 실패",
+				  text: "입력이 올바른지 다시 확인해주세요.",
+				  timer: 2000,
+				  toast: true,
+				  icon: "error"
 				});
+				
 				return false;
 			}
 			

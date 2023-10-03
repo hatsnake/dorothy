@@ -46,6 +46,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</select>
 	
 	<select id="emailDupCheck" parameterType="String" resultType="Integer">
-		SELECT COUNT(*) FROM MEMBER WHERE EMAIL = #{email}
+		SELECT COUNT(ID) FROM MEMBER WHERE EMAIL = #{email} LIMIT 1
 	</select>
 </mapper>
