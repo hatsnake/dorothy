@@ -14,7 +14,7 @@ public class PaymentController {
 		
 		log.info("Coupon Page End");
 		
-		return "/payment/couponForm";
+		return "payment/couponForm";
 	}
 	
 	@GetMapping("/payment")
@@ -23,6 +23,6 @@ public class PaymentController {
 		
 		log.info("Payment Page End");
 		
-		return "/payment/paymentForm";
+		return "payment/paymentForm";
 	}
 }
