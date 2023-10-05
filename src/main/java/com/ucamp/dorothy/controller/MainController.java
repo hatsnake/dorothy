@@ -13,7 +13,7 @@ public class MainController {
 	@GetMapping("/")
 	public String main() {
 		log.info("Main Page Start");
-		
+		log.info("TEST");
 		log.info("Main Page End");
 		return "main";
 	}
