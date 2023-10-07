@@ -14,7 +14,7 @@ public class OrderController {
 		
 		log.info("OrderHist Page End");
 		
-		return "/order/orderHistForm";
+		return "order/orderHistForm";
 	}
 	
 	@GetMapping("/order")
@@ -24,7 +24,7 @@ public class OrderController {
 		log.info("Order Page End");
 		
 
-		return "/order/orderForm";
+		return "order/orderForm";
 
 		}
 }
