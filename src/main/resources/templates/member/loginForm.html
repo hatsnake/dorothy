@@ -77,13 +77,85 @@
 
 <script>
 $(document).ready(function() {
-	$("#login_btn").on("click", function(event) {
+	var loginBtn = $("#login_btn");
+	var loginMsg = $("#loginMsg");
+	
+	loginBtn.on("click", function(event) {
 		var loginForm = $("#login_form");
 		loginForm.attr("method", "post");
 		loginForm.attr("action", "/login");
 		loginForm.submit();
 	});
+	
+	if(loginMsg.text() != "") {
+		$("#loginMsg").show();
+	} else {
+		$("#loginMsg").hide();		
+	}
+	
+	fncRememberId();
 });
+
+function fncRememberId() {
+	var cookieMemberId = getCookie("cookieMemberId");
+	var email = $("#email");
+	var rememberId = $("#remember-id");
+	
+	email.val(cookieMemberId);
+	
+	// 이에밍 입력창에 이메일 값이 있을 경우, 아이디 저장 체크박스 체크
+	if(email.val() != "") {
+		rememberId.attr("checked", true);
+	}
+	
+	// 아이디 체크 박스를 체크되면 이메일 쿠키 수정, 아니면 이메일 쿠키 삭제
+	rememberId.on("change", function() {
+		if(rememberId.is(":checked")) {
+			cookieMemberId = email.val();
+			setCookie("cookieMemberId", cookieMemberId, 30);
+		} else {
+			deleteCookie("cookieMemberId");
+		}
+	});
+	
+	// 이메일 값을 입력할 때, 아이디 저장 체크박스가 체크되어 있으면 이메일 쿠키 수정
+	email.on("keyup", function() {
+		if(rememberId.is(":checked")) {
+			cookieMemberId = email.val();
+			setCookie("cookieMemberId", cookieMemberId, 30);
+		}
+	});
+}
+
+// 쿠키 정보 수정
+function setCookie(cookieName, value, exdays){
+    var exdate = new Date();
+    exdate.setDate(exdate.getDate() + exdays);
+    var cookieValue = escape(value) + ((exdays==null) ? "" : "; expires=" + exdate.toGMTString());
+    document.cookie = cookieName + "=" + cookieValue;
+}
+
+// 쿠키 삭제
+function deleteCookie(cookieName){
+    var expireDate = new Date();
+    expireDate.setDate(expireDate.getDate() - 1);
+    document.cookie = cookieName + "= " + "; expires=" + expireDate.toGMTString();
+}
+
+// 쿠키 정보 가져오기
+function getCookie(cookieName) {
+    cookieName = cookieName + '=';
+    var cookieData = document.cookie;
+    var start = cookieData.indexOf(cookieName);
+    var cookieValue = '';
+    if(start != -1){
+        start += cookieName.length;
+        var end = cookieData.indexOf(';', start);
+        if(end == -1)end = cookieData.length;
+        cookieValue = cookieData.substring(start, end);
+    }
+    return unescape(cookieValue);
+}
 </script>
 
 <!-- Content page -->
@@ -97,26 +169,34 @@ $(document).ready(function() {
 	
 				<!-- 이메일 아이디 입력 -->
 				<div class="bor8 m-b-20 how-pos4-parent">
-					<input id="email" class="stext-111 cl2 plh3 size-116 p-l-62 p-r-30" style="font-size:17px; font-weight:bold;" type="text" name="username" placeholder="이메일">
+					<input id="email" class="stext-111 cl2 plh3 size-116 p-l-62 p-r-30" style="font-size:17px; font-weight:bold; color:gray;" type="text" name="username" placeholder="이메일">
 					<span class="how-pos4 pointer-none"><i id="email_icon" class="fa-solid fa-at" style="font-size:17px;"></i></span>
 				</div>
 				
 				<!-- 비밀번호 입력 -->
 				<div class="bor8 m-b-20 how-pos4-parent">
-					<input id="password" class="stext-111 cl2 plh3 size-116 p-l-62 p-r-30" style="font-size:17px; font-weight:bold;" type="password" name="password" placeholder="비밀번호">
+					<input id="password" class="stext-111 cl2 plh3 size-116 p-l-62 p-r-30" style="font-size:17px; font-weight:bold; color:gray;" type="password" name="password" placeholder="비밀번호">
 					<span class="how-pos4 pointer-none"><i id="pw_icon" class="fa-solid fa-lock" style="font-size:17px;"></i></span>
 				</div>
 	
+				<!-- 아이디 저장 버튼 -->
+				<div class="m-tb-20">
+					<label class="customcheck" style="font-weight:bold">아이디 저장
+						<input type="checkbox" id="remember-id" name="remember-id">
+						<span class="checkmark"></span>
+					</label>
+				</div>
+				
 				<!-- 로그인 유지 버튼 -->
-				<div class="m-tb-30">
+				<div class="m-tb-20">
 					<label class="customcheck" style="font-weight:bold">로그인 유지
-						<input type="checkbox" id="remember-me" name="remember-me">
+						<input type="checkbox" id="remember-login" name="remember-login">
 						<span class="checkmark"></span>
 					</label>
 				</div>
 	
 				<!-- 로그인 메시지 -->
-				<div th:text="${exception}" style="height:30px; color:red;"></div>
+				<div id="loginMsg" th:text="${exception}" style="height:30px; color:red;"></div>
 	
 				<!-- 로그인 버튼 -->
 				<div id="login_btn" class="flex-c-m stext-101 cl0 size-121 bg1 bor1 p-lr-15 trans-04 pointer m-tb-20" style="font-weight:bold">로그인</div>				

@@ -62,8 +62,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		// 로그인 유지 기능
 		http.rememberMe()
 			.key("dorothygood!")
-			.rememberMeParameter("remember-me")
-			.tokenValiditySeconds(86400*30)
+			.rememberMeParameter("remember-login")
+			.tokenValiditySeconds(86400*30) // 한달
 			.userDetailsService(securityService);
 		
 		// 접근에러시 이동 페이지
