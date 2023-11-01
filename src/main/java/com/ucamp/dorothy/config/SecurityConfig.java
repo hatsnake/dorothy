@@ -56,7 +56,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 		// 로그인 여부 접근 제어
 		http.authorizeRequests()
-			.antMatchers("/login", "/register", "/members/register/**").permitAll()
+			.antMatchers("/login", "/register", "/members/register/**", "/members/email/**", "/members/sms/**").permitAll()
 			.anyRequest().authenticated();
 		
 		// 로그인 유지 기능

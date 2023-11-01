@@ -73,15 +73,53 @@
 	-ms-transform: rotate(45deg);
 	transform: rotate(45deg);
 }
+
+/* btn with input */
+.input-with-btn {
+  	min-width: 163px;
+  	height: 60px;
+}
+
+.register-input {
+	width: 100%;
+	height: 60px;
+}
+
+
+@media (max-width: 480px) {
+	.d-flex {
+		display: block !important;
+	}
+}
+
+input:disabled {
+	background: #e6e6e6;
+}
 </style>
 
 <script>
+var sendMailCheck = false;
+var sendHpCheck = false;
+var emailVerifyCode = null;
+var hpVerifyCode = null;
+
 // 초기 실행값
-$(document).ready(function() {
+$(document).ready(function() {	
 	iconEffect();
 	
-	$("#email_in").on({
+	$("#hp_auth_btn").on("click", function() {
+		sendSmsVerify();
+	});
+	
+	$("#email_auth_btn").on("click", function() {
+		sendEmailVerify();
+	});
+	
+	$("#email_in, #email_number_in").on({
 		input: function() {
+			emailCheck();
+		},
+		focusout: function() {
 			emailCheck();
 		}
 	});
@@ -116,12 +154,18 @@ $(document).ready(function() {
 		}
 	});
 	
-	$("#hp_in").on({
+	$("#hp_in, #hp_number_in").on({
 		input: function() {
 			hpCheck();
 		},
 		focusout: function() {
 			hpCheck();
+		}
+	});
+	
+	$("#hp_btn").on({
+		click: function() {
+			sendSmsVerify();
 		}
 	});
 	
@@ -173,7 +217,7 @@ function registerConfirm(msg, title) {
 				swal({
 				  title: "회원가입 실패",
 				  text: "입력이 올바른지 다시 확인해주세요.",
-				  timer: 2000,
+				  timer: 3000,
 				  toast: true,
 				  icon: "error"
 				});
@@ -218,6 +262,8 @@ function registerConfirm(msg, title) {
 // 이메일 유효성 검사
 function emailCheck() {
 	var email = $("#email_in");
+	var emailVer = $("#email_number_in");
+	var emailBox = $("#email_number_box");
 	var emailMessage = $("#email_message");
 	var emailPattern = /^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$/;
 	
@@ -239,10 +285,35 @@ function emailCheck() {
 	}
 	
 	var dupCheck = emailDupCheck();
+	var emailVerCheck = emailVerificationCheck();
+	
+	if(dupCheck == false) {
+		email.css("border", "1px solid red");
+		email.css("color", "red");
+		emailMessage.html("* 중복된 이메일입니다.");
+		emailMessage.css("color", "red");
+		return false;
+	} else if(emailVerCheck == false) {
+		email.css("border", "1px solid green");
+		email.css("color", "green");
+		emailBox.css("border", "1px solid red");
+		emailVer.css("color", "red");
+		
+		if(sendMailCheck == true) {
+			emailMessage.html("* 이메일 인증번호가 일치하지 않습니다.");
+		} else {
+			emailMessage.html("* 이메일 인증이 필요합니다.");
+		}
+		
+		emailMessage.css("color", "red");
+		return false;
+	}
 	
 	// 이메일 통과
 	email.css("border", "1px solid green");
 	email.css("color", "green");
+	emailBox.css("border", "1px solid green");
+	emailVer.css("color", "green");
 	emailMessage.html("");
 	
 	return true;
@@ -252,38 +323,54 @@ function emailCheck() {
 function emailDupCheck() {
 	var email = $("#email_in");
 	var emailMessage = $("#email_message");
-	var result = false;
+	var result = true;
 	
 	var emailDupCheckParams = {
 		email : email.val()	
 	};
-	
+
 	$.ajax({
 		method: "GET",
 		url: "/members/register/emailDupCheck",
 		data: emailDupCheckParams,
+		async: false,
 		beforeSend: function(xhr) {
-			
 		},
 		success: function(res) {
-			if(res == true) {
-				//email.css("border", "1px solid green");
-				//email.css("color", "green");
-				//emailMessage.html("");
-				//emailMessage.css("color", "green");
-				result = true;
-			} else {
-				email.css("border", "1px solid red");
-				email.css("color", "red");
-				emailMessage.html("* 중복된 이메일입니다.");
-				emailMessage.css("color", "red");
+			if(res != true) {
 				result = false;
+			} else {
+				result = true;
 			}
 		},
 		error: function(request, status, error) {
 			alert("이메일 중복체크 실패\n상태 : " + request.status + "\n원인메시지 : " + request.responseText);
+			result = false;
 		}
 	});
+
+	return result;
+}
+	
+function emailVerificationCheck() {
+	var emailVer = $("#email_number_in");
+	var email = $("#email_in");
+	var emailMessage = $("#email_message");
+	var emailBox = $("#email_number_box");
+	var result = true;
+	
+	if(sendMailCheck == true) {
+		if(emailVer.val() != emailVerifyCode) {
+			emailVer.attr("disabled", false);
+			emailBox.css("background", "transparent");
+			result = false;
+		} else {
+			emailVer.attr("disabled", true);
+			emailBox.css("background", "#e6e6e6");
+		}
+	} else {
+		result = false;
+	}
 	
 	return result;
 }
@@ -397,18 +484,43 @@ function repwCheck() {
 function hpCheck() {
 	var hp = $("#hp_in");
 	var hpMessage = $("#hp_message");
+	var hpVer = $("#hp_number_in");
+	var hpBox = $("#hp_number_box");
 	
 	// 전화번호 빈값체크
 	if(hp.val() == "") {
 		hp.css("border", "1px solid red");
-		hpMessage.html("* 전화번호는 필수 입력 정보입니다.");
+		hp.css("color", "red");
 		hpMessage.css("color", "red");
+		hpMessage.html("* 전화번호는 필수 입력 정보입니다.");
 		return false;
 	}
+	
+	if(hpVer.val() != hpVerifyCode) {
+		hp.css("border", "1px solid green");
+		hp.css("color", "green");
+		hpBox.css("border", "1px solid red");
+		hpVer.css("color", "red");
+		
+		if(sendHpCheck == true) {
+			hpMessage.html("* 전화번호 인증번호가 일치하지 않습니다.");
+		} else {
+			hpMessage.html("* 전화번호 인증이 필요합니다.");
+		}
+		hpMessage.css("color", "red");
+		
+		return false;
+	} else {
+		hpVer.attr("disabled", true);
+		hpBox.css("background", "#e6e6e6");
+	}
+	
 	
 	// 전화번호 통과
 	hp.css("border", "1px solid green");
 	hp.css("color", "green");
+	hpBox.css("border", "1px solid green");
+	hpVer.css("color", "green");
 	hpMessage.html("");
 	
 	return true;
@@ -469,13 +581,299 @@ function scrollToTop() {
     });
 }
 
+function sendEmailVerify() {
+	var email = $("#email_in");
+	var emailVer = $("#email_number_in");
+	var emailBox = $("#email_number_box");
+	var emailBtn = $("#email_auth_btn");
+	
+	if(sendMailCheck == false) {
+		var emailValidCheck = sendEmailValid();
+		
+		if(emailValidCheck == false) {
+			swal({
+				title: "이메일 인증번호 전송 실패",
+				text: "가능한 이메일만 인증번호가 전송됩니다. 다시 확인해주세요.",
+			    timer: 3000,
+			    toast: true,
+				icon: "error",
+			});
+			
+			return false;
+		}
+		
+		var emailVerifyParams = {
+			emailAddress : email.val()
+		};
+			
+		$.ajax({
+			method: "POST",
+			url: "/members/email/emailVerify",
+			data: emailVerifyParams,
+			beforeSend: function(xhr) {
+	           var header = $("meta[name='_csrf_header']").attr("content");
+	           var token = $("meta[name='_csrf']").attr("content");
+	           xhr.setRequestHeader(header, token);
+	           
+	           // 로딩 버튼으로 변경하기
+	           emailBtn.removeClass('pointer');
+	           emailBtn.addClass('pointer-none');
+	           emailBtn.attr("disabled", true);
+	           emailBtn.empty();
+	           emailBtn.append('<span class="spinner-border spinner-border-sm mr-2" aria-hidden="true"></span>');
+	           emailBtn.append('<span>전송중 . .</span>');
+			},
+			success: function(res) {
+				
+				swal({
+					title: "이메일 인증번호 전송 성공",
+					text: "이메일 인증번호를 전송하였습니다. 확인해주세요.",
+				    timer: 3000,
+				    toast: true,
+					icon: "info",
+				});
+				
+				emailVerifyCode = res;
+				
+				sendMailCheck = true;
+				email.attr("disabled", true);
+				emailVer.attr("disabled", false);
+				emailBox.css("background", "transparent");
+				
+	            // 기본 버튼으로 변경
+	            emailBtn.removeClass('pointer-none');
+	            emailBtn.addClass('pointer');
+	            emailBtn.empty();
+	            emailBtn.attr("disabled", false);
+	            emailBtn.append('<span>이메일 인증</span>');
+			},
+			error: function(request, status, error) {
+				swal({
+					title: "이메일 인증번호 전송 실패",
+					text: "에러로 인해 이메일 인증번호 전송을 하지 못했습니다.",
+				    timer: 3000,
+				    toast: true,
+					icon: "info",
+				});
+				
+	            // 기본 버튼으로 변경
+	            emailBtn.removeClass('pointer-none');
+	            emailBtn.addClass('pointer');
+	            emailBtn.empty();
+	            emailBtn.attr("disabled", false);
+	            emailBtn.append('<span>이메일 인증</span>');
+			}
+		});
+	} else {
+		swal({
+			title: "이메일 인증번호 전송",
+			text: "이미 이메일 인증번호를 전송 완료하였습니다.",
+		    timer: 3000,
+		    toast: true,
+			icon: "error",
+		});
+	}
+	
+	/*
+	var email = $("#email_in");
+	
+	var emailResult = emailCheck();
+	
+	if(emailResult == false) {
+		swal({
+			title: "이메일 인증번호 전송 불가",
+			text: "입력한 이메일이 적합한지 확인해주세요.",
+			icon: "warning",
+		})
+		return false;
+	}
+	
+	// 회원가입 로직
+	var emailVeriParams = {
+		email : email.val()
+	};
+	
+	$.ajax({
+		method: "POST",
+		url: "/members/mail/emailVerification",
+		data: emailVeriParams,
+		beforeSend: function(xhr) {
+           var header = $("meta[name='_csrf_header']").attr("content");
+           var token = $("meta[name='_csrf']").attr("content");
+           xhr.setRequestHeader(header, token);
+		},
+		success: function(res) {
+			alert("이메일 인증 메일 발송 성공");
+		},
+		error: function(request, status, error) {
+			alert("이메일 인증 메일 발송 실패");
+		}
+	});
+	*/
+}
+
+function sendEmailValid() {
+	var email = $("#email_in");
+	var emailVer = $("#email_number_in");
+	var emailBox = $("#email_number_box");
+	var emailMessage = $("#email_message");
+	var emailPattern = /^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$/;
+	
+	// 이메일 빈값체크
+	if(email.val() == "") {
+		return false;
+	}
+	
+	// 이메일 입력조건체크
+	if(!(emailPattern.test(email.val()))) {
+		return false;
+	}
+	
+	var dupCheck = emailDupCheck();
+	
+	if(dupCheck == false) {
+		return false;
+	}
+	
+	return true;
+}
+
+/*
+function emailTimer() {
+	var time = 180;
+	var min = "";
+	var sec = "";
+	
+	var x = setInterval(function() {
+		min = parseInt(time/60);
+		sec = time%60;
+		
+		$("#email_timer").html(min + ":" + fillZero(sec,2));
+		time--;
+		
+		if(time < 0) {
+			// 이메일 인증 타임아웃 알림창
+			swal({
+			  title: "이메일 인증 실패",
+			  text: "이메일 인증 시간이 종료되었습니다. 다시 인증 번호를 요청해주세요.",
+			  timer: 3000,
+			  toast: true,
+			  icon: "error"
+			});
+			
+			clearInterval(x);
+			
+		}
+	}, 1000);
+	
+	return x;
+}
+*/
+
+function fillZero(n, width) {
+    n = n + '';
+    return n.length >= width ? n : new Array(width - n.length + 1).join('0') + n;
+
+}
+
+function sendSmsVerify() {
+	var hp = $("#hp_in");
+	var hpVer = $("#hp_number_in");
+	var hpBox = $("#hp_number_box");
+	var hpBtn = $("#hp_auth_btn");
+	
+	if(sendHpCheck == false) {
+		if(hp.val() == "") {
+			swal({
+				title: "전화번호 인증번호 전송 실패",
+				text: "전화번호를 입력하지 않아서 인증번호를 전송할 수 없습니다.",
+			    timer: 3000,
+			    toast: true,
+				icon: "error",
+			});
+			
+			return false;
+		}
+		
+		var smsVerifyParams = {
+			hp : hp.val()
+		};
+				
+		$.ajax({
+			method: "POST",
+			url: "/members/sms/smsVerify",
+			data: smsVerifyParams,
+			beforeSend: function(xhr) {
+	           var header = $("meta[name='_csrf_header']").attr("content");
+	           var token = $("meta[name='_csrf']").attr("content");
+	           xhr.setRequestHeader(header, token);
+	           
+	           // 로딩 버튼으로 변경하기
+	           hpBtn.removeClass('pointer');
+	           hpBtn.addClass('pointer-none');
+	           hpBtn.attr("disabled", true);
+	           hpBtn.empty();
+	           hpBtn.append('<span class="spinner-border spinner-border-sm mr-2" aria-hidden="true"></span>');
+	           hpBtn.append('<span>전송중 . .</span>');
+			},
+			success: function(res) {
+				swal({
+					title: "전화번호 인증번호 전송 성공",
+					text: "전송된 휴대폰 인증번호를 확인해주세요.",
+				    timer: 3000,
+				    toast: true,
+					icon: "success",
+				});
+				
+				hpVerifyCode = res;
+				
+				sendHpCheck = true;
+				hp.attr("disabled", true);
+				hpVer.attr("disabled", false);
+				hpBox.css("background", "transparent");
+				
+	            // 기본 버튼으로 변경
+	            hpBtn.removeClass('pointer-none');
+	            hpBtn.addClass('pointer');
+	            hpBtn.empty();
+	            hpBtn.attr("disabled", false);
+	            hpBtn.append('<span>전화번호 인증</span>');
+			},
+			error: function(request, status, error) {
+				swal({
+					title: "전화번호 인증번호 전송 실패",
+					text: "에러로 인해 휴대폰 인증번호 전송을 하지 못했습니다.",
+				    timer: 3000,
+				    toast: true,
+					icon: "info",
+				});
+				
+	            // 기본 버튼으로 변경
+	            hpBtn.removeClass('pointer-none');
+	            hpBtn.addClass('pointer');
+	            hpBtn.empty();
+	            hpBtn.attr("disabled", false);
+	            hpBtn.append('<span>전화번호 인증</span>');
+			}
+		});
+	} else {
+		swal({
+			title: "전화번호 인증번호 전송",
+			text: "이미 전화번호 인증번호를 전송 완료하였습니다.",
+		    timer: 3000,
+		    toast: true,
+			icon: "error",
+		});
+	}
+}
+
 </script>
 
 <!-- Content page -->
 <section class="bg0 p-t-104 p-b-116">
 	<div class="container">
 		<div class="bor10 p-lr-70 p-t-55 p-b-70 p-lr-15-lg w-full-md" style="max-width:690px; margin:0 auto;">
-			<form id="register_form">
+			<!-- <form id="register_form"> -->
 				<h4 class="ltext-103 cl2 txt-center p-b-20" style="font-weight:bold">
 					회원가입
 				</h4>
@@ -496,15 +894,36 @@ function scrollToTop() {
 							</span>
 						</div>
 					</div>
-
-					<div class="flex-w flex-m m-tb-5">
-						<input id="email_in"  type="text" name="email" class="stext-104 cl2 plh4 size-116 bor13 p-lr-20 m-tb-5" placeholder="이메일 입력" style="border-radius:0;">
-							
-						<div class="flex-c-m stext-101 cl2 size-118 bg8 bor13 p-lr-15 trans-04 pointer m-tb-5" style="border-radius:0; font-weight:bold;">
-							이메일 인증
+					
+					<div class="d-flex">
+					  <div class="p-2 w-100">
+					  	<input id="email_in"  type="text" name="email" class="register-input cl2 plh4 bor13 p-lr-20 m-tb-5" placeholder="이메일 입력" style="border-radius:0;">
+					  </div>
+					  <div class="p-2 flex-shrink-1">
+					    
+						<button id="email_auth_btn" class="btn flex-c-m stext-101 cl2 input-with-btn bg8 bor13 p-lr-15 trans-04 pointer m-tb-5" 
+								style="border-radius:0; font-weight:bold; background:#6495ED; color:white;">
+							<span>이메일 인증</span>
+						</button>
+					  </div>
+					</div>
+					
+					<!-- 
+					<div class="flex-w flex-m m-tb-5 p-2" style="margin-top: 0px !important;">
+						<div id="email_number_box" class="input-group bor13" style="border-radius: 0px; padding-right: 10px; background: #e5e5e5;">
+							<input id="email_number_in" type="text" name="name" class="stext-104 cl2 plh4 size-116 p-lr-20 m-tb-5" placeholder="인증번호 입력" style="border-radius:0;" disabled=true>
+							<span id="email_timer" class="input-group-text" style="line-height:60px; padding-left:5px; font-size:18px;"></span>
 						</div>
 					</div>
-					<div id="email_message"></div>
+					 -->
+
+					<div class="flex-w flex-m m-tb-5 p-2" style="margin-top: 0px !important;">
+						<div id="email_number_box" class="input-group bor13" style="border-radius: 0px; padding-right: 10px; background: #e5e5e5;">
+							<input id="email_number_in" type="text" name="name" class="stext-104 cl2 plh4 size-116 p-lr-20 m-tb-5" placeholder="인증번호 입력" style="border-radius:0;" disabled=true>
+						</div>
+					</div>
+
+					<div id="email_message" class="p-2"></div>
 				</div>
 
 				<!-- 이름 -->
@@ -524,11 +943,11 @@ function scrollToTop() {
 						</div>
 					</div>
 
-					<div class="flex-w flex-m m-tb-5">
-						<input id="name_in" type="text" name="name" class="stext-104 cl2 plh4 size-116 bor13 p-lr-20 m-tb-5" placeholder="이름 입력" style="border-radius:0;">
+					<div class="flex-w flex-m m-tb-5 p-2">
+						<input id="name_in" type="text" name="name" class="register-input stext-104 cl2 plh4 bor13 p-lr-20 m-tb-5" placeholder="이름 입력" style="border-radius:0;">
 					</div>
 					
-					<div id="name_message"></div>
+					<div id="name_message" class="p-2"></div>
 				</div>
 
 				<!-- 비밀번호 -->
@@ -548,11 +967,11 @@ function scrollToTop() {
 						</div>
 					</div>
 
-					<div class="flex-w flex-m m-tb-5">
-						<input id="pw_in" type="password" name="pw" class="stext-104 cl2 plh4 size-116 bor13 p-lr-20 m-tb-5" placeholder="비밀번호 입력" style="border-radius:0;">
+					<div class="flex-w flex-m m-tb-5 p-2">
+						<input id="pw_in" type="password" name="pw" class="register-input stext-104 cl2 plh4 bor13 p-lr-20 m-tb-5" placeholder="비밀번호 입력" style="border-radius:0;">
 					</div>
 					
-					<div id="pw_message"></div>
+					<div id="pw_message" class="p-2"></div>
 				</div>
 
 				<!-- 비밀번호 확인 -->
@@ -572,11 +991,11 @@ function scrollToTop() {
 						</div>
 					</div>
 
-					<div class="flex-w flex-m m-tb-5">
-						<input id="repw_in" type="password" name="repw" class="stext-104 cl2 plh4 size-116 bor13 p-lr-20 m-tb-5" placeholder="비밀번호 확인 입력" style="border-radius:0;">
+					<div class="flex-w flex-m m-tb-5 p-2">
+						<input id="repw_in" type="password" name="repw" class="register-input stext-104 cl2 plh4 bor13 p-lr-20 m-tb-5" placeholder="비밀번호 확인 입력" style="border-radius:0;">
 					</div>
 					
-					<div id="repw_message"></div>
+					<div id="repw_message" class="p-2"></div>
 				</div>
 
 				<!-- 전화번호 -->
@@ -595,15 +1014,26 @@ function scrollToTop() {
 							</span>
 						</div>
 					</div>
+					
+					<div class="d-flex">
+					  <div class="p-2 w-100">
+					  	<input id="hp_in"  type="text" name="email" class="register-input cl2 plh4 bor13 p-lr-20 m-tb-5" placeholder="전화번호 입력 (-없이 숫자만)" style="border-radius:0;">
+					  </div>
+					  <div class="p-2 flex-shrink-1">
+						<button id="hp_auth_btn" class="btn flex-c-m stext-101 cl2 input-with-btn bg8 bor13 p-lr-15 trans-04 pointer m-tb-5" 
+						     style="border-radius:0; font-weight:bold; background:#3CB371; color:white;">
+							<span>전화번호 인증</span>
+						</button>
+					  </div>
+					</div>
 
-					<div class="flex-w flex-m m-tb-5">
-						<input id="hp_in" type="text" name="hp" class="stext-104 cl2 plh4 size-116 bor13 p-lr-20 m-tb-5" placeholder="전화번호 입력 (-없이 숫자만)" style="border-radius:0;">
-						<div class="flex-c-m stext-101 cl2 size-118 bg8 bor13 p-lr-15 trans-04 pointer m-tb-5" style="border-radius:0; font-weight:bold;">
-							전화번호 인증
+					<div class="flex-w flex-m m-tb-5 p-2" style="margin-top: 0px !important;">
+						<div id="hp_number_box" class="input-group bor13" style="border-radius: 0px; padding-right: 10px; background: #e5e5e5;">
+							<input id="hp_number_in" type="text" name="name" class="stext-104 cl2 plh4 size-116 p-lr-20 m-tb-5" placeholder="인증번호 입력" style="border-radius:0;" disabled=true>
 						</div>
 					</div>
 					
-					<div id="hp_message"></div>
+					<div id="hp_message" class="p-2"></div>
 				</div>
 
 				<div class="m-tb-30">
@@ -617,7 +1047,7 @@ function scrollToTop() {
 				<div style="margin-top: 20px; text-align:center;">이미 계정이 있으신가요? <a href="/login">로그인</a></div>
 				
 				<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-			</form>
+			<!-- </form> -->
 		</div>
 	</div>
 </section>

@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ucamp.dorothy.common.mail.SendMail;
 import com.ucamp.dorothy.domain.Member;
+import com.ucamp.dorothy.domain.SendEmailHistory;
 import com.ucamp.dorothy.service.MemberService;
 
 import lombok.RequiredArgsConstructor;
@@ -39,5 +41,19 @@ public class MemberRestController {
 		log.info("Email Duplicate Check End");
 		
 		return new ResponseEntity<>(dupFlag, HttpStatus.OK);
+	}
+	
+	@PostMapping("/email/emailVerify")
+	public String emailVerify(SendEmailHistory sendEmailHistory) throws Exception {
+		log.info("emailVerify() start");
+		log.info("emailVerify() End");
+		return service.sendVerifyEmail(sendEmailHistory.getEmailAddress());
+	}
+	
+	@PostMapping("/sms/smsVerify")
+	public String smsVerify(String hp) throws Exception {
+		log.info("smsVerify() start");
+		log.info("smsVerify() End");
+		return service.sendVerifySms(hp);
 	}
 }

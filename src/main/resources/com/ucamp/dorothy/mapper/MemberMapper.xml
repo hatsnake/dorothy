@@ -48,4 +48,24 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<select id="emailDupCheck" parameterType="String" resultType="Integer">
 		SELECT COUNT(ID) FROM MEMBER WHERE EMAIL = #{email} LIMIT 1
 	</select>
+	
+	<insert id="saveSendEmailHistory" parameterType="com.ucamp.dorothy.domain.SendEmailHistory">
+		INSERT INTO SEND_EMAIL_HISTORY (
+			  EMAIL_ADDRESS
+			, SUBJECT
+			, VERIFY_CODE
+			, CONTENT
+			, EMAIL_TYPE
+			, CREATED_USER
+			, CREATED_DATE
+		) VALUES (
+			  #{emailAddress}
+			, #{subject}
+			, #{verifyCode}
+			, #{content}
+			, '01'
+			, #{createdUser}
+			, now()
+		)
+	</insert>
 </mapper>
