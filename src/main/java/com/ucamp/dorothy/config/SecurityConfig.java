@@ -13,6 +13,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 
 import com.ucamp.dorothy.common.security.CustomLoginFailureHandler;
 import com.ucamp.dorothy.common.security.CustomLoginSuccessHandler;
+import com.ucamp.dorothy.service.CustomOAuth2UserService;
 import com.ucamp.dorothy.service.MemberService;
 import com.ucamp.dorothy.service.SecurityService;
 
@@ -25,6 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	private final SecurityService securityService;
+	
+	private final CustomOAuth2UserService customerOAuth2UserService;
 	
     @Override
     public void configure(WebSecurity web) throws Exception {
@@ -41,7 +44,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		return new CustomLoginSuccessHandler();
 	}
 	
-	@Bean AuthenticationFailureHandler authenticationFailureHandler() {
+	@Bean 
+	AuthenticationFailureHandler authenticationFailureHandler() {
 		return new CustomLoginFailureHandler();
 	}
 	
@@ -56,7 +60,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 		// 로그인 여부 접근 제어
 		http.authorizeRequests()
-			.antMatchers("/login", "/register", "/members/register/**", "/members/email/**", "/members/sms/**").permitAll()
+			.antMatchers("/login", "/register", "/resetPassword", "/members/register/**", "/members/email/**", "/members/sms/**").permitAll()
 			.anyRequest().authenticated();
 		
 		// 로그인 유지 기능
@@ -79,6 +83,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.formLogin()
 			.loginPage("/login")
 			.failureHandler(authenticationFailureHandler())
-			.successHandler(authenticationSuccessHandler());
+			.successHandler(authenticationSuccessHandler())
+			.and()
+			.oauth2Login()
+			.loginPage("/login")
+			.userInfoEndpoint()
+			.userService(customerOAuth2UserService);
 	}
 }

@@ -73,6 +73,41 @@
 		-ms-transform: rotate(45deg);
 		transform: rotate(45deg);
 	}
+	
+    .customBtn {
+      display: inline-block;
+      background: white;
+      color: #444;
+      width: 190px;
+      border-radius: 5px;
+      border: thin solid #888;
+      box-shadow: 1px 1px 1px grey;
+      white-space: nowrap;
+    }
+    .customBtn:hover {
+      cursor: pointer;
+    }
+    span.label {
+      font-family: serif;
+      font-weight: normal;
+    }
+    span.icon {
+      background: url('/images/signin/google.png') transparent 5px 50% no-repeat;
+      display: inline-block;
+      vertical-align: middle;
+      width: 42px;
+      height: 42px;
+    }
+    span.buttonText {
+      display: inline-block;
+      vertical-align: middle;
+      padding-left: 42px;
+      padding-right: 42px;
+      font-size: 14px;
+      font-weight: bold;
+      /* Use the Roboto font that is loaded in the <head> */
+      font-family: 'Roboto', sans-serif;
+    }
 </style>
 
 <script>
@@ -162,7 +197,7 @@ function getCookie(cookieName) {
 <section class="bg0 p-t-104 p-b-116">
 	<div class="container">
 		<form id="login_form">
-			<div class="bor10 p-lr-70 p-t-55 p-b-70 p-lr-15-lg w-full-md" style="max-width:690px; margin:0 auto;">
+			<div class="bor10 p-lr-70 p-t-55 p-b-70 p-lr-15-lg w-full-md" style="max-width:480px; margin:0 auto;">
 				<h4 class="ltext-103 cl2 txt-center p-b-30" style="font-weight:bold">
 					로그인
 				</h4>
@@ -201,18 +236,16 @@ function getCookie(cookieName) {
 				<!-- 로그인 버튼 -->
 				<div id="login_btn" class="flex-c-m stext-101 cl0 size-121 bg1 bor1 p-lr-15 trans-04 pointer m-tb-20" style="font-weight:bold">로그인</div>				
 				<div style="text-align:center;">아직 계정이 없으신가요? <a href="/register">회원가입</a></div>
+				<div style="text-align:center;">비밀번호를 잃어버리셨나요? <a href="/resetPassword">비밀번호 초기화</a></div>
 	
 				<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 				
-				<!-- 
-				<button class="flex-c-m stext-101 size-121 bor1 hov-btn3 p-lr-15 trans-04 pointer m-tb-20" style="font-weight:bold; border-radius:0; box-shadow:3px 3px 9px;">
-					<i class="fa-brands fa-github"></i>&nbsp;&nbsp; GitHub 계정으로 로그인
-				</button>
-	
-				<div class="flex-c-m stext-101 size-121 bor1 hov-btn3 p-lr-15 trans-04 pointer m-tb-20" style="font-weight:bold; border-radius:0; box-shadow:3px 3px 9px;">
-					<i class="fa-brands fa-google"></i>&nbsp;&nbsp; Google 계정으로 로그인
-				</div>
-				 -->
+				<div style="width:100%; margin-top:15px;">
+					<a href="/oauth2/authorization/google" id="googleLoginButton" class="btn customGPlusSignIn customBtn" style="width:322px; display:block; margin:0 auto;">
+				      <span class="icon"></span>
+				      <span class="buttonText">구글 로그인</span>
+				    </a>
+			    </div>
 			</div>
 		</form>
 	</div>

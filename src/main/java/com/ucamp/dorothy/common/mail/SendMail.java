@@ -9,6 +9,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import com.ucamp.dorothy.domain.SendEmailHistory;
+import com.ucamp.dorothy.mapper.MemberMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,6 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 public class SendMail {
 	@Autowired
 	private JavaMailSender javaMailSender;
+	@Autowired
+	private MemberMapper memberMapper;
 	
 	public SendEmailHistory sendMail(String email) {
 		System.out.println("sendMail access");
@@ -52,7 +55,43 @@ public class SendMail {
 		return emailInfo;
 	}
 	
-    private String generateRandomCode(int length) {
+	public SendEmailHistory sendResetPwMail(String email, String pw) {
+		System.out.println("sendMail access");
+		log.info("SendMail.sendMail() Start");
+		SendEmailHistory emailInfo = null;
+		String subjectTemplate = "비밀번호 초기화";
+		String contentTemplate = "초기화된 비밀번호는 [?]입니다.";
+		
+		try {
+			//String randomCode = generateRandomCode(6);
+			
+			emailInfo = new SendEmailHistory();
+			emailInfo.setEmailAddress(email);
+			//emailInfo.setVerifyCode(randomCode);
+			emailInfo.setSubject(subjectTemplate);
+			emailInfo.setContent(contentTemplate.replace("?", pw));
+			emailInfo.setCreatedUser(email);
+			
+			ArrayList<String> list = new ArrayList<>();
+			list.add(emailInfo.getEmailAddress());
+			int listSize = list.size();
+			
+			SimpleMailMessage simpleMessage = new SimpleMailMessage();
+			simpleMessage.setTo((String[]) list.toArray(new String[listSize]));
+			simpleMessage.setSubject(emailInfo.getSubject());
+			simpleMessage.setText(emailInfo.getContent());
+			javaMailSender.send(simpleMessage);
+			// 히스토리 저장
+			memberMapper.saveSendEmailHistory(emailInfo);
+		} catch(Exception e) {
+			System.out.println(e);
+		}
+		
+		log.info("SendMail.sendMail() End");
+		return emailInfo;
+	}
+	
+    public String generateRandomCode(int length) {
         String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         SecureRandom random = new SecureRandom();
         StringBuilder code = new StringBuilder();

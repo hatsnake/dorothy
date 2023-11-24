@@ -13,4 +13,6 @@ public interface MemberService {
 	public int emailDupCheck(String email) throws Exception;
 	public String sendVerifyEmail(String email) throws Exception;
 	public String sendVerifySms(String hp) throws Exception;
+	public int checkAccountByResetPw(Member member) throws Exception;
+	public int updateResetPw(Member member) throws Exception;
 }

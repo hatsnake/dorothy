@@ -41,6 +41,20 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		)
 	</insert>
 	
+	<insert id="save" parameterType="com.ucamp.dorothy.domain.Member">
+		INSERT INTO MEMBER (
+			 EMAIL
+		   , NAME
+		   , CREATED_USER
+		   , CREATED_DATE
+		) VALUES (
+			#{email}
+		  , #{name}
+		  , #{email}
+		  , now()
+		)
+	</insert>
+	
 	<select id="signIn" parameterType="String" resultType="com.ucamp.dorothy.domain.Member">
 		SELECT ID, EMAIL, PW, NAME FROM MEMBER WHERE EMAIL = #{email}
 	</select>
@@ -68,4 +82,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			, now()
 		)
 	</insert>
+	
+	<select id="findByEmail" parameterType="String" resultType="com.ucamp.dorothy.domain.Member">
+		SELECT * FROM MEMBER WHERE EMAIL = #{email}
+	</select>	
+	
+	<select id="checkAccountByResetPw" parameterType="com.ucamp.dorothy.domain.Member" resultType="Integer">
+		SELECT COUNT(ID) FROM MEMBER WHERE EMAIL=#{email} AND NAME=#{name}
+	</select>
+	
+	<update id="updateResetPw" parameterType="com.ucamp.dorothy.domain.Member">
+		UPDATE MEMBER SET
+		  PW = #{pw}
+		WHERE EMAIL=#{email} AND NAME=#{name}
+	</update>
 </mapper>

@@ -55,4 +55,15 @@ public class MemberServiceImpl implements MemberService {
 	public String sendVerifySms(String hp) throws Exception {
 		return sendSms.singleSms(hp);
 	}
+
+	@Override
+	public int checkAccountByResetPw(Member member) throws Exception {
+		return mapper.checkAccountByResetPw(member);
+	}
+	
+	@Override
+	public int updateResetPw(Member member) throws Exception {
+		return mapper.updateResetPw(member);
+	}
+	
 }

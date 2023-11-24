@@ -38,12 +38,20 @@ public class MemberController {
 	@GetMapping("/register")
 	public String registerForm() {
 		log.info("Register Page Start");
-
-		log.info("Register Page End");
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if(auth instanceof AnonymousAuthenticationToken)
 			return "member/registerForm";
+		return "redirect:/";
+	}
+	
+	@GetMapping("/resetPassword")
+	public String resetPasswordForm() {
+		log.info("Reset Password Page Start");
+				
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if(auth instanceof AnonymousAuthenticationToken)
+			return "member/resetPasswordForm";
 		return "redirect:/";
 	}
 }
