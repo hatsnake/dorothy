@@ -9,7 +9,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		SELECT 
 		    ID
 		  , EMAIL
-		  , PW
 		  , NAME
 		  , HP
 		  , DELETE_YN AS DELETEYN
@@ -84,7 +83,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</insert>
 	
 	<select id="findByEmail" parameterType="String" resultType="com.ucamp.dorothy.domain.Member">
-		SELECT * FROM MEMBER WHERE EMAIL = #{email}
+		SELECT
+		    ID
+		  , EMAIL
+		  , NAME
+		  , HP
+		  , DELETE_YN AS DELETEYN
+		  , AUTH
+		  , CREATED_USER AS CREATEDUSER
+		  , CREATED_DATE AS CREATEDDATE
+		  , UPDATED_USER AS UPDATEDUSER
+		  , UPDATED_DATE AS UPDATEDDATE
+		FROM MEMBER WHERE EMAIL = #{email}
 	</select>	
 	
 	<select id="checkAccountByResetPw" parameterType="com.ucamp.dorothy.domain.Member" resultType="Integer">
