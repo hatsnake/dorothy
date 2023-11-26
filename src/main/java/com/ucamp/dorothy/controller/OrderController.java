@@ -1,7 +1,13 @@
 package com.ucamp.dorothy.controller;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,14 +23,14 @@ public class OrderController {
 		return "order/orderHistForm";
 	}
 	
-	@GetMapping("/order")
-	public String orderForm() {
-		log.info("Order Page Start");
-		
-		log.info("Order Page End");
-		
+    @GetMapping("/order")
+    public String showOrderPage(@RequestParam String itemName, @RequestParam Integer itemPrice, Model model) {
 
-		return "order/orderForm";
+        model.addAttribute("itemName", itemName);
+        model.addAttribute("itemPrice", itemPrice);
+        
+        return "order/orderForm";
+    }
+	
 
-		}
 }

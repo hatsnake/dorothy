@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ucamp.dorothy.mapper.CouponMapper">
+
+	
+	<select id="selectCouponList" resultType="com.ucamp.dorothy.domain.Coupon">
+		<![CDATA[
+		SELECT
+				ID,
+				NAME,
+				PRICE,
+				USE_YN AS USEYN,
+				ACTIVE_YN AS ACTIVEYN,
+				START_DATE AS STARTDATE,
+				END_DATE AS ENDDATE,
+			    CREATED_USER AS CREATEDUSER,
+			    CREATED_DATE AS CREATEDDATE,
+			    UPDATED_USER AS UPDATEDUSER,
+			    UPDATED_DATE AS UPDATEDDATE,
+				MEMBER_ID AS MEMBERID
+		FROM
+				COUPON
+		WHERE
+				MEMBER_ID = '11'
+					
+		]]>		
+	</select>
+	
+
+</mapper>

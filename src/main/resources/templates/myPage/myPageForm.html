@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="layout/default_layout">
+<th:block layout:fragment="content">
+
+<style>
+#container {
+	width: 960px;
+	margin: 0 auto;
+	text-align: center;
+}
+.tab {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+}
+#tabcontent {
+	display: block;
+	background-color: rgb(255, 255, 255);
+	padding: 6px 12px;
+	color: rgb(0, 0, 64);
+}
+a{
+	display: inline-block;
+	color: #000;
+	text-align: center;
+	text-decoration: none;
+	padding: 14px 16px;
+	font-size: 17px;
+	transition: 0.3s;
+}
+a:visited { 
+	color: black; 
+	text-decoration: none;
+	
+	}
+
+
+li {
+	float: center;
+	display: inline-block;
+	color: #000;
+	text-align: center;
+	text-decoration: none;
+	padding: 10px 10px;
+	font-size: 17px;
+	border-radius: 15px;
+}
+
+</style>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+	$(function() {
+		// tab operation
+		$('.tabmenu').click(function() {
+			var activeTab = $(this).attr('data-tab');
+			$('li').css('background-color', 'white');
+			$(this).css('background-color', 'rgb(230, 230, 250)');
+			$.ajax({
+				type : 'GET', 
+				url : activeTab,   
+				dataType : "html",
+				error : function() {     
+					alert('조회 불가능');
+				},
+				success : function(data) { 
+					$('#tabcontent').html(data);
+				}
+			});
+		});
+		$('#default').click();          
+	});
+</script>
+
+<body>
+<div id="container">
+		<ul class="tab">
+			<li data-tab="myInfo" class='tabmenu' id="default"><a href="#">내 정보</a></li>
+			<li data-tab="orderHist" class='tabmenu'><a href="#">주문 내역</a></li>
+			<li data-tab="coupon" class='tabmenu'><a href="#">쿠폰</a></li>
+		</ul>
+		<div id="tabcontent"></div>
+	</div>
+</body>
+
+</th:block>
+</html>

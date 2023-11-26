@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ucamp.dorothy.mapper.PointMapper">
+
+	
+	<select id="selectPointList" resultType="com.ucamp.dorothy.domain.Point">
+		<![CDATA[
+		SELECT
+				ID,
+				NAME,
+				PRICE,
+				USE_YN AS USEYN,
+				ACTIVE_YN AS ACTIVEYN,
+			    CREATED_USER AS CREATEDUSER,
+			    CREATED_DATE AS CREATEDDATE,
+			    UPDATED_USER AS UPDATEDUSER,
+			    UPDATED_DATE AS UPDATEDDATE,
+				MEMBER_ID AS MEMBERID
+		FROM
+				POINT
+				
+		WHERE		
+				MEMBER_ID = '11'
+					
+		]]>		
+	</select>
+	
+
+</mapper>

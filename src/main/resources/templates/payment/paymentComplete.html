@@ -1,0 +1,27 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="layout/default_layout">
+ 
+<th:block layout:fragment="content">
+		<!-- paymentComplete.html -->
+		<head>
+		    <meta charset="UTF-8">
+		    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+		    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+		    <title>Payment Complete</title>
+		</head>
+		<body>
+		    <h1>Payment Complete</h1>
+		
+		    <script>
+		        // 결제 완료 알림창 표시
+		        alert('결제가 완료되었습니다');
+		
+		        // 확인 버튼을 누르면 홈으로 리다이렉트
+		        window.location.href = '/';
+		    </script>
+		</body>
+	</th:block>
+</html>

@@ -1,0 +1,65 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="layout/default_layout">
+ 
+<th:block layout:fragment="content">
+
+<head>	 
+	<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>		
+
+</head>	
+
+<body>
+	
+
+
+		
+		<!-- payment -->
+		<form class="bg0 p-t-75 p-b-85">
+			<div class="container">
+				<div class="row">
+					
+					<div class="m-l-25 m-r--38 m-lr-0-xl">
+						<div class="wrap-table-shopping-cart">
+							<table class="table-shopping-cart">
+								<tr class="table_head">
+									<th class="column-1"></th>
+									<th class="column-2">상품</th>
+									<th class="column-3">가격</th>
+									<th class="column-4"></th>
+									<th class="column-5"></th>
+								</tr>
+	
+								<tr th:each="item : ${list}">
+									<td class="column-1">
+										<div class="how-itemcart1">
+											<img th:src="@{/images/} + ${item.imageMain}" alt="IMG">
+										</div>
+									</td>
+									<td th:text="${item.name}"></td>
+									<td th:text="${item.price}"></td>
+									<td class="column-4">
+										<button type="button" class="btn btn-primary" style = "margin-bottom : 5px" data-bs-toggle="modal" data-bs-target="#exampleModal">장바구니</button>
+									</td>
+										<td class="column-5">
+											<form id="orderForm" action="/order" method="get">
+											    <input type="hidden" name="itemName" value="${item.name}">
+											    <input type="hidden" name="itemPrice" value="${item.price}">
+											    <button type="submit">Order Now</button>
+											</form>
+										</td>
+								</tr>
+								
+
+								
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</body>	
+	</th:block>
+</html>
